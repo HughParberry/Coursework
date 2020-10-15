@@ -36,6 +36,23 @@ public class Pros {
         }
     }
     @POST
+    @Path("update")
+    public String updateFood(@FormDataParam("proID") Integer proId, @FormDataParam("proPseudo") String UserName) {
+        try {
+            System.out.println("Invoked Users.UpdateUsers/update UserID=" + proId);
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Users SET UserName = ? WHERE UserID = ?");
+            ps.setString(1, UserName);
+            ps.setInt(2, proId);
+            ps.execute();
+            return "{\"OK\": \"Users updated\"}";
+        } catch (Exception exception) {
+            System.out.println("Database error: " + exception.getMessage());
+            return "{\"Error\": \"Unable to update item, please see server console for more info.\"}";
+        }
+    }
+
+
+    @POST
     @Path("add")
     public String proAdd(@FormDataParam("proFore") String proFore, @FormDataParam("proSur") String proSur, @FormDataParam("proPseudo") String proPseudo,  @FormDataParam("dateBirth") String dateBirth, @FormDataParam("netWorth") Float netWorth) {
         System.out.println("Invoked Pro.proAdd()");
