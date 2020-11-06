@@ -1,13 +1,14 @@
 package controllers;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import server.Main;
+
+import javax.ws.rs.*;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /* ------------------------------------------------------------------------------
  This class serves up the static HTML, CSS, JavaScript and images to the client.
@@ -57,6 +58,31 @@ public class Client {
     public byte[] getFavicon() {
         return getFile("client/favicon.ico");
     }
+    @POST
+    @Path("logout")
+    public static String logout(@CookieParam("Token") String Token){
+        try{
+            System.out.println("users/logout "+ Token);
+            PreparedStatement ps = Main.db.prepareStatement("SELECT userId FROM Users WHERE Token=?");
+            ps.setString(1, Token);
+            ResultSet logoutResults = ps.executeQuery();
+            if (logoutResults.next()){
+                int UserID = logoutResults.getInt(1);
+                //Set the token to null to indicate that the user is not logged in
+                PreparedStatement ps1 = Main.db.prepareStatement("UPDATE Users SET Token = NULL WHERE userId = ?");
+                ps1.setInt(1, UserID);
+                ps1.executeUpdate();
+                return "{\"status\": \"OK\"}";
+            } else {
+                return "{\"error\": \"Invalid token!\"}";
+
+            }
+        } catch (Exception ex) {
+            System.out.println("Database error during /users/logout: " + ex.getMessage());
+            return "{\"error\": \"Server side error!\"}";
+        }
+    }
+
 
     private static byte[] getFile(String filename) {
         try {
