@@ -9,12 +9,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.UUID;
 
 @Path("Pros/")
 @Consumes(MediaType.MULTIPART_FORM_DATA)
 @Produces(MediaType.APPLICATION_JSON)
 
-public class Pros {
+public class Admin {
     @GET
     @Path("list")
     public String ProList() {
@@ -92,5 +93,34 @@ public class Pros {
         }
     }
 
-
-}
+    @POST
+    @Path("login")
+    public String UsersLogin(@FormDataParam("userName") String userName, @FormDataParam("userPassword") String PassWord) {
+        System.out.println("Invoked loginUser() on path users/login");
+        try {
+            PreparedStatement ps1 = Main.db.prepareStatement("SELECT userPassword FROM userData WHERE userName = ?");
+            ps1.setString(1, userName);
+            ResultSet loginResults = ps1.executeQuery();
+            if (loginResults.next() == true) {
+                String correctPassword = loginResults.getString(1);
+                if (PassWord.equals(correctPassword)) {
+                    String Token = UUID.randomUUID().toString();
+                    PreparedStatement ps2 = Main.db.prepareStatement("UPDATE userData SET Token = ? WHERE userName = ?");
+                    ps2.setString(1, Token);
+                    ps2.setString(2, userName);
+                    ps2.executeUpdate();
+                    JSONObject userDetails = new JSONObject();
+                    userDetails.put("userName", userName);
+                    userDetails.put("Token", Token);
+                    return userDetails.toString();
+                } else {
+                    return "{\"Error\": \"Incorrect password!\"}";
+                }
+            } else {
+                return "{\"Error\": \"Incorrect username.\"}";
+            }
+        } catch (Exception exception) {
+            System.out.println("Database error during /users/login: " + exception.getMessage());
+            return "{\"Error\": \"Server side error!\"}";
+        }
+}}
