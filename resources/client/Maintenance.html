@@ -11,21 +11,13 @@
     <script src="/client/js/dataCall.js"></script>
 </head>
 <body>
-<button onclick='getUsersList();'>RUN MY FUNCTION</button>
 <table id="UsersTable"></table>
-<p>This person's a nerd ---></p>
-<p>Le funny</p>
-<form id="userDetails">
-    User id: <input type="text" id="proId">
-</form>
-<button onclick='getUser();'>Run getUser</button>
 <div id="DisplayOneUser"></div>
 <form id="InputUserDetails">
     Username: <input type="text" name="UserName">
     Password: <input type="text" name="PassWord">
 </form>
-<button onclick='addUser();'>Add User</button>
 <br>
-<button class="button" onclick=window.open("Login.html","_self")> login</button>
+<button class="button" onclick='UsersLogin();'>LOGIN</button>
 </body>
 </html>
